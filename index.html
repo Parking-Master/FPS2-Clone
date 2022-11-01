@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPS2 Multiplayer shooter</title>
+    <style>
+      html, body {
+        overflow: hidden !important;
+        cursor: url(./cursors/cursor0.cur), auto !important;
+      }
+      body {
+        background: #fff;
+        background: linear-gradient(90deg, #fff 0%, #38b6ff 100%);
+      }
+      @font-face {
+        font-family: "BigShouldersDisplayBold";
+        src: url(./fonts/BigShouldersDisplay/BigShouldersDisplay-Bold.ttf);
+      }
+      @font-face {
+        font-family: "BigShouldersDisplayRegular";
+        src: url(./fonts/BigShouldersDisplay/BigShouldersDisplay-Light.ttf);
+      }
+      @font-face {
+        font-family: "AgrandirWideBlack";
+        src: url(./fonts/Agrandir/AgrandirWideBlack.ttf);
+      }
+      #heading0 {
+        position: relative;
+        left: 50%;
+        margin: 0;
+        width: 45%;
+        margin-left: -22.5%;
+      }
+      #heading1 {
+        color: #38b6ff;
+        font-family: "BigShouldersDisplayRegular";
+        font-size: 5.5vw;
+        text-align: center;
+      }
+      #background {
+        position: absolute;
+        width: 45%;
+        z-index: -1;
+        left: 50%;
+        margin-left: -22.5%;
+      }
+      #sidebar {
+        position: absolute;
+        top: 0;
+        height: 100vw !important;
+        margin: 0 !important;
+        width: 10%;
+        z-index: -1;
+        margin: 0;
+        left: 30px;
+      }
+      hr {
+        width: 50%;
+        padding: 0 !important;
+        background: #38b6ff;
+        outline: none !important;
+        border: none !important;
+        height: 4px;
+        margin-bottom: -2vw !important;
+        margin-top: -2vw !important;
+      }
+      img {
+        pointer-events: none !important;
+      }
+      * {
+        user-select: none !important;
+        cursor: url(./cursors/cursor0.cur), auto !important;
+      }
+      button.button {
+        position: relative;
+        background: #fff;
+        width: 50%;
+        border: 5px solid #38b6ff;
+        text-align: center;
+        left: 50%;
+        margin-left: -25%;
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
+        padding: 15px;
+        font-family: "AgrandirWideBlack" !important;
+        color: #38b6ff;
+        font-size: 15px;
+        transition: font-size .1s, padding .1s;
+      }
+      button.button:hover {
+        font-size: 20px;
+        padding: 12px;
+      }
+      .cover {
+        position: fixed;
+        height: 50%;
+        width: 100%;
+        top: -100%;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin: 0;
+        background: #fff;
+        z-index: 9999;
+        margin-top: -10px;
+        border-bottom: 10px solid #38b6ff;
+        padding-top: 100px;
+        text-align: center;
+      }
+      a {
+        color: #38b6ff !important;
+        font-family: "AgrandirWideBlack";
+        border-bottom: 2px solid #38b6ff;
+        text-decoration: none !important;
+      }
+      .swal-modal {
+        border-radius: none !important;
+        background: #fff;
+      }
+      .swal-modal * {
+        color: #38b6ff;
+        font-family: "AgrandirWideBlack";
+      }
+      .swal-button {
+        background: #38b6ff;
+        color: #fff !important;
+      }
+      .simple-keyboard {
+        position: fixed;
+        margin: 0;
+        bottom: 0 !important;
+        right: 0 !important;
+        left: 0 !important;
+        z-index: 999999;
+        display: none;
+      }
+    </style>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
+    <script type="text/javascript" src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  </head>
+  <body>
+    <img id="background" src="text-images/rifles.png">
+    <img id="sidebar" src="text-images/sidebar.png">
+    <img id="heading0" src="text-images/heading.png">
+    <hr>
+    <h1 id="heading1">MULTIPLAYER SHOOTER</h1>
+    <div class="buttons">
+      <button class="button" onclick="play(this)">PLAY</button>
+      <br>
+      <button class="button" onclick="chat()">CHAT</button>
+      <br>
+      <button class="button" onclick="help()">HELP</button>
+    </div>
+    <p style="color:#38b6ff;font-family:Arial,Helvetica,sans-serif;font-weight:10;text-align:center;margin-top:0">&copy; 2021-2023 Parking Master</p>
+    <div class="cover">
+      <span id="close" style="color:#ff4444;font-size:25px" onclick="play()">&times;</span>
+      <h1 style="font-family:'BigShouldersDisplayRegular';font-size:50px;color:#38b6ff">&bullet; PLAY &bullet;</h1>
+      <br>
+      <a href="" onclick="event.preventDefault(); createLobby()">CREATE LOBBY</a>
+      <br>
+      <a href="" onclick="event.preventDefault(); findLobby()">FIND LOBBY</a>
+      <br>
+      <a href="" onclick="event.preventDefault(); enterCode()">ENTER CODE</a>
+      <br>
+      <a href="" onclick="event.preventDefault(); autoSearch()">AUTO SEARCH</a>
+      <br>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alvaromontoro/gamecontroller.js@latest/dist/gamecontroller.min.js"></script>
+    <div class="simple-keyboard"></div>
+    <script src="https://cdn.jsdelivr.net/gh/notiflix/Notiflix@latest/dist/notiflix-aio-3.2.5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/Parking-Master/FPS-Tipper@main/tipper.js" defer async="false"></script>
+    <script>
+      /**
+        * @license
+        * Copyright (c) 2021 Parking-Master / (Gametime.js)
+        * Licensed under the MIT License (https://mit-license.org)
+        * More license and copyright information at https://github.com/Parking-Master/Gametime.js/blob/main/LICENSE
+      */
+      function setCookie(e, n, t) {
+        let i = "";
+        if (t) {
+        let o = new Date;
+        o.setTime(o.getTime() + 24 * t * 60 * 60 * 1e3), i = "; expires=" + o.toUTCString()
+        }
+        document.cookie = e + "=" + (n || "") + i + "; path=/"
+      }
+      function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+        }
+        }
+        return null;
+      }
+      window.pubnub = undefined;
+      window.ms = Date.now();
+      window.addEventListener("load", () => {
+        ms = Date.now() - ms;
+      });
+      window.addEventListener("beforeunload", (() => {
+        setCookie("pubnub-time-token", `${(new Date).getTime()}0000`, 10)
+      })), window.gametime = {}, gametime.onconnect = null, gametime.ondisconnect = null, window.gametime.events = [], window.gametime.events.functions = [], gametime.connected = !1, gametime.set = function(e, n, t) {
+        return function(e, n, t) {
+          if ("key" == e) {
+            let e = n,
+            u = t;
+            let i = document.createElement("script");
+            i.src = "https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.7.min.js", document.body.appendChild(i);
+            let o = setInterval((function() {
+              if ("undefined" != typeof PubNub) {
+                clearInterval(o);
+                const n = PubNub.generateUUID();
+                pubnub = new PubNub({
+                  publishKey: e,
+                  subscribeKey: u,
+                  uuid: n
+                }), gametime.user = {}, gametime.user.id = n;
+                pubnub.addListener({
+                  message: function(e) {
+                    new Function("(" + decodeURIComponent(e.message) + ")();")()
+                  },
+                  presence: function(e) {
+                    console.log(e.uuid)
+                  }
+                }), setTimeout((function() {
+                  let f = ((ms.toFixed(0) - 0) / (ms*1.5));
+                  console.info("%cGametime.js connecting in " + f.toFixed(0) + " second(s)...", "font-family: Arial, helvetica, sans-serif;");
+                  delete ms;
+                  const e = encodeURIComponent('function(){console.info("%cGametime.js successfully connected!","font-family: Arial, helvetica, sans-serif;");}');
+                  pubnub.publish({
+                    channel: gametime.channel,
+                    message: e
+                  }, (function(e, n) {
+                  if (e.error) {
+                    gametime.connected = !1;
+                    throw new Error("An error occurred while trying to establish a connection with Gametime.js.\nMake sure the Publish/Subscribe keys are correct and that you are on the right channel.")
+                  } else {
+                  gametime.didConnect();
+                  gametime.connected = !0;
+                  if (typeof gametime.onconnect == "function") {
+                    gametime.onconnect();
+                  }
+                  }
+                  }))
+                }), 3e3)
+              }
+            }), 250)
+          } else "channel" == e ? (void 0 === pubnub ? setTimeout((function() {
+            pubnub.subscribe({
+              channels: [n],
+              timetoken: getCookie("pubnub-time-token"),
+              message: function(e) {
+              if ("unsubscribe" == e.type) return pubnub.unsubscribe({
+                channel: e.channel
+              })
+              },
+              withPresence: !0
+            })
+          }), 900) : pubnub.subscribe({
+            channels: [n],
+            withPresence: !0
+          }), window.gametime.channel = n) : "join-max-length" == e ? gametime.join.maxLength = "string" == typeof n ? parseFloat(n, 0) : n : "join-min-length" == e && (gametime.join.minLength = "string" == typeof n ? parseFloat(n, 0) : n)
+        }(e, n, t)
+      }, gametime.make = function(e) {
+        let n
+        return n = e, void window.gametime.events.push(n);
+      }, gametime.on = function(e, n) {
+        return function(e, n) {
+          if (!(window.gametime.events.indexOf(e) > -1)) throw new ReferenceError('Event "' + e.toString() + '" not found');
+          let t = document.createElement("script"),
+          i = (n = n.toString()).split("{")[0],
+          o = n.toString().split("{")[0].split("(").pop().split(")").shift(),
+          u = n.substring(n.indexOf('{') + 1);
+          o = o || "undefined";
+          n = i + "{pubnub.publish({channel:'" + gametime.channel + "',message:'" + (encodeURIComponent(i) + "{var " + o + ' = "ncmmmasptr__ + ' + o + ' + ncmmmasptr__";' + encodeURIComponent(u)).replace(/\'/g, "\\'").replace(/ncmmmasptr__/g, "'") + "'});}", t.textContent = "gametime.events.functions." + e + " = " + n + ";", document.body.appendChild(t)
+        }(e, n)
+      }, gametime.recursion = 0, gametime.run = function(e, n) {
+        return function(e, n) {
+          n && void 0 !== n || (n = [""]);
+          for (let t = [], i = 0; i < n.length; i++) t.push('"' + n[i] + '"'), new Function("gametime.events.functions." + e + "(" + t + ")")()
+        }(e, n)
+      }, window.gametime.join = {}, gametime.join.maxLength = 2, gametime.join.minLength = 2, gametime.disconnect = function() {
+        gametime.connected = !1, pubnub.publish({
+          channel: "control",
+          message: {
+            command: "unsubscribe",
+            channel: gametime.channel
+          }
+        });
+        pubnub.disconnect();
+      }
+      window.addEventListener("load", function() {
+        window.gametime.connectedPlayers = 0;
+        window.willBeAutoHost = false;
+        window.isHost = false;
+        window.Guest = false;
+        window.gametime.idList = [];
+        gametime.make("collectId");
+        gametime.make("renderScene");
+        gametime.make("isGuest");
+        gametime.on("isGuest", () => {
+          !isHost && (gametime.user.position = 2, isGuest = true, isHost = false);
+        });
+        gametime.on("renderScene", function() {
+          gametime.connectedPlayers += 1;
+          setTimeout(() => {
+            if (gametime.connectedPlayers == 1) {
+              willBeAutoHost = true;
+            }
+          }, 0);
+        });
+        gametime.on("collectId", (id) => {
+          gametime.idList.push(id);
+          gametime.idList = [... new Set(gametime.idList)];
+        });
+        window.gametime.didConnect = function() {
+          gametime.run("collectId", [gametime.user.id]);
+          gametime.run("renderScene");
+          setInterval(() => {
+            gametime.user.position = (gametime.idList[0] == gametime.user.id) ? 1 : 2;
+          });
+          if (willBeAutoHost) {
+            isHost = true;
+            isGuest = false;
+          } else {
+            isHost = false;
+            isGuest = true;
+          }
+          gametime.run("isGuest");
+        };
+      });
+      // End Gametime.js import
+      gametime.init = function() {
+        gametime.set("key", "pub-c-c44c8fc4-612e-4fc3-b875-4398f01da63c", "sub-c-b6832794-3c08-11ec-b2c1-a25c7fcd9558");
+      }
+      gametime.init();
+      gametime.set("channel", "start_search" + Math.random());
+      gameControl.on("connect", (controller) => {
+        window.controller = controller;
+        lookSensitivity=.003;lookAcc=0;lookMax=.1;(()=>{let d=false;dl=!1,setInterval((()=>{let e;-1==navigator.getGamepads()[0].axes[0]&&(dl&&document.dispatchEvent(new KeyboardEvent("keydown",{key:"ArrowLeft"})),dl=!0,e=setInterval((()=>{if(-1!=navigator.getGamepads()[0].axes[0])return document.dispatchEvent(new KeyboardEvent("keyup",{key:"ArrowRight"})),document.dispatchEvent(new KeyboardEvent("keyup",{key:"ArrowLeft"})),dl=!1,clearInterval(e)})))})),dl=!1,setInterval((()=>{let e;1==navigator.getGamepads()[0].axes[0]&&(dl&&document.dispatchEvent(new KeyboardEvent("keydown",{key:"ArrowRight"})),dl=!0,e=setInterval((()=>{if(1!=navigator.getGamepads()[0].axes[0])return document.dispatchEvent(new KeyboardEvent("keyup",{key:"ArrowLeft"})),document.dispatchEvent(new KeyboardEvent("keyup",{key:"ArrowRight"})),dl=!1,clearInterval(e)})))})),controller.on("right0",(()=>{document.dispatchEvent(new KeyboardEvent("keydown",{key:"ArrowDown"}))})).before("right0",(()=>{})).after("right0",(()=>{document.dispatchEvent(new KeyboardEvent("keyup",{key:"ArrowDown"}))})),controller.on("left0",(()=>{document.dispatchEvent(new KeyboardEvent("keydown",{key:"ArrowUp"}))})).before("left0",(()=>{})).after("left0",(()=>{document.dispatchEvent(new KeyboardEvent("keyup",{key:"ArrowUp"}))})),controller.on("button16",(()=>{})).before("button16",()=>{document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.shoot}))}).after("button16",()=>{document.dispatchEvent(new KeyboardEvent("keyup",{key:keyControls.shoot}))}),controller.on("l1",(()=>{})).before("l1",(()=>{document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.switchWeapon}))}))})(),controller.on('up0',()=>{camera.rotation.y+=lookAcc;lookAcc>=lookMax||(lookAcc+=(lookSensitivity)),gametime.run("playerRotate", [camera.rotation.x+","+camera.rotation.y+","+camera.rotation.z+","+gametime.user.position])}).before('up0',()=>{camera.rotation.y+=lookAcc;lookAcc>=lookMax||(lookAcc+=(lookSensitivity)),gametime.run("playerRotate", [camera.rotation.x+","+camera.rotation.y+","+camera.rotation.z+","+gametime.user.position])}).after('up0',()=>{lookAcc=0}),controller.on('down0',()=>{camera.rotation.y+=-lookAcc;lookAcc>=lookMax||(lookAcc+=(lookSensitivity)),gametime.run("playerRotate", [camera.rotation.x+","+camera.rotation.y+","+camera.rotation.z+","+gametime.user.position])}).before('down0',()=>{camera.rotation.y+=-lookAcc;lookAcc>=lookMax||(lookAcc+=(lookSensitivity)),gametime.run("playerRotate", [camera.rotation.x+","+camera.rotation.y+","+camera.rotation.z+","+gametime.user.position])}).after('down0',()=>{lookAcc=0}),controller.on('left1',()=>{camera.rotation.x+=lookAcc;lookAcc>=lookMax||(lookAcc+=(lookSensitivity)),gametime.run("playerRotate", [camera.rotation.x+","+camera.rotation.y+","+camera.rotation.z+","+gametime.user.position])}).before('left1',()=>{camera.rotation.x+=lookAcc;lookAcc>=lookMax||(lookAcc+=(lookSensitivity)),gametime.run("playerRotate", [camera.rotation.x+","+camera.rotation.y+","+camera.rotation.z+","+gametime.user.position])}).after('left1',()=>{lookAcc=0}),controller.on('right1',()=>{camera.rotation.x+=-lookAcc;lookAcc>=lookMax||(lookAcc+=(lookSensitivity)),gametime.run("playerRotate", [camera.rotation.x+","+camera.rotation.y+","+camera.rotation.z+","+gametime.user.position])}).before('right1',()=>{camera.rotation.x+=-lookAcc;lookAcc>=lookMax||(lookAcc+=(lookSensitivity)),gametime.run("playerRotate", [camera.rotation.x+","+camera.rotation.y+","+camera.rotation.z+","+gametime.user.position])}).after('right1',()=>{lookAcc=0}),controller.on('button0',()=>{}).before('button0',()=>{document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.jump}))}).after('button0',()=>{}),controller.on('button1',()=>{}).before('button1',()=>{document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.punch}))}).after('button1',()=>{}),controller.on('button14',()=>{}).before('button14',()=>{isZoomed?document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.zoomOut})):document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.zoomIn}))}).after('button14',()=>{}),controller.on('button7',()=>{}).before('button7',()=>{isTouchingOrdinance?document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.interact})):(!isReloading&&document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.reload})))}).after('button7',()=>{}),controller.on('button15',()=>{}).before('button15',()=>{document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.throwGrenade}))}).after('button15',()=>{}),controller.on('button11',()=>{}).before('button11',()=>{document.dispatchEvent(new KeyboardEvent("keydown",{key:keyControls.pause}))}).after('button11',()=>{});
+      });
+      let Keyboard = SimpleKeyboard.default;
+      let keyboard = new Keyboard({
+        onChange: input => onChange(input),
+        onKeyPress: button => onKeyPress(button)
+      });
+      currentFocus = null;
+      currentScroll = 0;
+      focusMax = null;
+      function onKeyPress(button) {
+        console.log(button);
+      }
+      setInterval(() => {
+        for (let i = 0; i < document.querySelectorAll("a").length; i++) {
+          Object.values(document.querySelectorAll("a")[i].classList).indexOf("focus")>-1||document.querySelectorAll("a")[i].classList.add("focus");
+        }
+        for (let i = 0; i < document.querySelectorAll("button").length; i++) {
+          Object.values(document.querySelectorAll("button")[i].classList).indexOf("focus")>-1||document.querySelectorAll("button")[i].classList.add("focus");
+        }
+        for (let i = 0; i < document.querySelectorAll("input").length; i++) {
+          Object.values(document.querySelectorAll("input")[i].classList).indexOf("focus")>-1||document.querySelectorAll("input")[i].classList.add("focus");
+        }
+        if(currentFocus!=null&&document.querySelector(".tabfocus"+currentFocus).tagName.toLowerCase()=="input"){
+          document.querySelector(".tabfocus"+currentFocus).addEventListener("input", (event) => {
+            keyboard.setInput(event.target.value);
+          });
+          lockInput&&(document.querySelector(".simple-keyboard").style.display = "block");
+          document.querySelectorAll(".hg-button")[keyfocus].style.outline="4px solid #38b6ff";
+          let e=Object.values(document.querySelectorAll(".hg-button"));e=e.filter((function(e){return e!=document.querySelectorAll(".hg-button")[keyfocus]}));for(let t=0;t<e.length;t++)e[t].style.outline="none";
+          window.onChange = function(input) {
+            document.querySelector(".tabfocus"+currentFocus).value = input;
+            createlobbytext = input;
+          }
+        }else{
+          document.querySelector(".simple-keyboard").style.display = "none";
+        }
+        for (let i = 0; i < document.querySelectorAll(".focus").length; i++) {
+          Object.values(document.querySelectorAll(".focus")[0].classList).indexOf("tabfocus"+i)>-1||document.querySelectorAll(".focus")[i].classList.add("tabfocus"+i);
+          focusMax = document.querySelectorAll(".focus").length - 1;
+        }
+      });
+      setInterval(() => {
+        if (!currentFocus && currentFocus != 0) { return }
+        document.querySelector(".tabfocus"+currentFocus).style.outline = "4px solid #eee";
+        for (let i = 0; i < Object.values(document.querySelectorAll(".focus")).filter(e => e !== document.querySelector(".tabfocus"+currentFocus)).length; i++) {
+          Object.values(document.querySelectorAll(".focus")).filter(e => e !== document.querySelector(".tabfocus"+currentFocus))[i].style.outline = "none";
+        }
+      });
+      id = Math.random().toString();
+      lockInput = null;
+      Parse.initialize("bHe2YiXotGOruwjsso41nGjJEO4NfvcSIx0gUAhX","qnqEwzriDSdqq9LvcxleSthtLusd6HM5HisIaKUN"),Parse.serverURL="https://parseapi.back4app.com/";
+      Lobby = new Parse.Object.extend("Lobby");
+      createlobbytext = "";
+      function code(){let r="";for(let a=1;a<=6;a++)r+=a%2==0?String.fromCharCode(26*Math.random()+65):Math.ceil(9*Math.random());return r}
+      function createLobby() {
+        swal({
+          title: "Create a lobby",
+          text: "Enter a lobby name (2-10 characters:)",
+          content: "input",
+          button: "Create"
+        }).then(() => {
+          let name = createlobbytext;
+          console.log(name)
+          if (!name) return;
+          if (name.length < 2) return swal("Lobby name should be over 2 characters.");
+          if (name.length > 10) return swal("Lobby name should be under 10 characters.");
+          let lobby = new Lobby();
+          lobby.set("name", name);
+          lobby.set("code", document.getElementsByName("code")[0].checked ? code() : "");
+          lobby.save().then(() => (console.log("Lobby \"" + name.toString() + "\" saved"), lobby.get("code").length > 0 ? location.assign("src.html?lobby=" + encodeURIComponent(name) + "&code=" + lobby.get("code")) : findLobby(name)));
+          createlobbytext = "";
+        });
+        setTimeout(() => { document.querySelector(".swal-content__input").addEventListener("keyup", () => { createlobbytext = document.querySelector(".swal-content__input").value }) }, 500);
+        document.querySelector(".swal-content").innerHTML += `
+        <br>
+        <input type="checkbox" name="code">
+        <label for="code">Players have to enter a code</label>
+        `;
+      }
+      function findLobby(selected) {
+        (async() => {
+          let e = !1;
+          const t = Parse.Object.extend("Lobby");
+          const n = new Parse.Query(t);
+          const s = await n.find();
+          for (let t = 0; t < s.length; t++) {
+            const n = Parse.Object.extend("Lobby");
+            new Parse.Query(n).get(s[t].id).then((t => {
+              const n = { name: t.get("name"), time: t.get("createdAt"), code: t.get("code") };
+              if (e) {
+                document.querySelector(".swal-content").innerHTML += n.code.length > 0 ? "" : '<div class="lobby" id="' + btoa(encodeURIComponent(n.name)).replace(/\=/gi,"") + '">"<a onclick="location.assign(\'./src.html?lobby=' + encodeURIComponent(n.name) + '\')">' + (n.name.trim() == "" ? ("(blank space)") : n.name.trim()) + '</a>" : ' + n.time.toString().split(" ").reverse().splice(4).reverse().splice(1).join(" ").split(":").reverse().splice(1).reverse().join(":") + "</div>";
+              } else {
+                e = !0;
+                let content = document.createElement("div");
+                content.innerHTML = n.code.length > 0 ? "" : '<br><div class="lobby" id="' + btoa(encodeURIComponent(n.name)).replace(/\=/gi,"") + '">"<a onclick="location.assign(\'./src.html?lobby='+encodeURIComponent(n.name)+'\')">' + n.name+'</a>" : ' + n.time.toString().split(" ").reverse().splice(4).reverse().splice(1).join(" ").split(":").reverse().splice(1).reverse().join(":") + "</div>";
+                swal({
+                  title: "FIND A LOBBY",
+                  content: content
+                });
+              }
+            }));
+            setTimeout(() => {
+              if (selected) {
+                document.querySelector("#"+btoa(encodeURIComponent(selected)).replace(/(\=)/gi,"")).style.outline = "2px solid #38b6ff";
+                document.querySelector("#"+btoa(encodeURIComponent(selected)).replace(/(\=)/gi,"")).scrollIntoView();
+              }
+            }, 1000);
+          }
+        })();
+      }
+      function enterCode() {
+        swal({
+          title: "Enter a code",
+          text: "This will join a lobby with the selected code. Example: \"XXXXXX\"",
+          content: "input",
+          button: "Join"
+        }).then((name) => {
+          !name || swal({
+            title: "Searching...",
+            text: "Attempting to find lobby",
+            button: "Cancel"
+          });
+          !name || (async () => {
+            let e = !1;
+            let code = name.toUpperCase();
+            let codes = {};
+            const t = Parse.Object.extend("Lobby");
+            const n = new Parse.Query(t);
+            const s = await n.find();
+            let pause = false;
+            for (let t = 0; t < s.length; t++) {
+              let ot = t;
+              const n = Parse.Object.extend("Lobby");
+              new Parse.Query(n).get(s[t].id).then((t => {
+                const n = { name: t.get("name"), code: t.get("code") };
+                if (e) {
+                  codes[n.name] = (n.code);
+                } else {
+                  e = !0;
+                }
+                console.log(n.code, code);
+                console.log(n.code == code);
+                if (!pause) (n.code == (code) ? (pause = true, swal({ title: "Lobby found", text: "Do you want to join the lobby \"" + n.name + "\"?", buttons: ["Yes", "No"] }).then((e) => !e && location.assign("./src.html?lobby=" + encodeURIComponent(n.name) + "&code=" + code))) : ot + 1 >= s.length && swal({ title: "Lobby not found", text: "This lobby does not exist." }));
+              }));
+            }
+          })();
+        });
+      }
+      didPlay = false;
+      function play(button) {
+        if (!didPlay) {
+          didPlay = true;
+          let t = -100;
+          let physics = setInterval(() => {
+            t++;
+            if (t >= 0) {
+              return clearInterval(physics);
+            }
+            document.querySelector(".cover").style.top = t + "%";
+          });
+          return;
+        }
+        didPlay = false;
+        let t = 0;
+        let physics = setInterval(() => {
+          t--;
+          if (t <= -100) {
+            return clearInterval(physics);
+          }
+          document.querySelector(".cover").style.top = t + "%";
+        });
+      }
+      let users = 0;
+      function autoSearch() {
+        swal({
+          title: "Searching for match...",
+          text: "You will be notified when an active lobby is found.",
+          closeOnClickOutside: false,
+          closeOnEnterKey: false,
+          closeOnSpaceKey: false
+        }).then(() => {
+          clearInterval(search);
+        });
+        gametime.onconnect = function() {
+          users++;
+          if (users >= 2) {
+            swal({
+              title: "Match Found",
+              text: "Connecting users..."
+            });
+            setTimeout(() => location.assign("./src.html?lobby=" + gametime.channel), 2000);
+          }
+        };
+        gametime.make("ping");
+        gametime.make("sync");
+        gametime.make("connected");
+        pinged = false;
+        gametime.on("sync", function(data) {
+          data.split(",")[1] == id || gametime.set("channel", data.split(",")[0]);
+        });
+        gametime.on("ping", function(user) {
+          if (pinged && user == id) {
+            return gametime.run("connected", [gametime.channel]), gametime.run("connected", [gametime.channel]);
+          }
+          pinged = true;
+          setTimeout(() => (pinged = false), 10000);
+        });
+        gametime.on("connected", function(channel) {
+          swal({
+            title: "Match Found",
+            text: "There is 1 player in lobby \"" + channel + "\"",
+            button: "Cancel"
+          });
+          setTimeout(()  => (gametime.run("ping", [id]), gametime.run("ping", [id])), 100);
+          gametime.run("sync", [gametime.channel+","+id]);
+          gametime.run("sync", [channel+","+id]);
+          gametime.set("channel", channel);
+          setTimeout(() => location.assign("./src.html?lobby=" + channel), 6000);
+          clearInterval(search);
+        });
+        search = 0;
+        (async () => {
+          let e = !1;
+          const t = Parse.Object.extend("Lobby");
+          const n = new Parse.Query(t);
+          const s = await n.find();
+          let names = [];
+          let pause = false;
+          for (let t = 0; t < s.length; t++) {
+            let ot = t;
+            const n = Parse.Object.extend("Lobby");
+            new Parse.Query(n).get(s[t].id).then((t => {
+              const n = { name: t.get("name"), code: t.get("code") };
+              if (e) {
+                names.push(n.name);
+              } else {
+                names.push(n.name);
+                e = !0;
+              }
+            }));
+          }
+          search = setInterval(() => { gametime.set("channel", (names[Math.floor(Math.random()*names.length)])), console.log(gametime.channel), setTimeout(()  => (gametime.run("ping", [id]), gametime.run("ping", [id])), 100) }, 10000);
+        })();
+      }
+      let s = swal.close;
+      swal.close = function() {
+        currentFocus = 0;
+        s();
+      }
+      keyfocusmax=document.querySelectorAll(".hg-button").length;
+      keyfocus=0;
+      setInterval(() => { document.querySelector(".swal-button") != null && (document.querySelector(".swal-button").onclick = () => (currentFocus = 0)) }, 100);
+      gameControl.on("connect", (controller) => {
+        (()=>{let p=false;let d=false;dl=!1,setInterval((()=>{let e;-1==navigator.getGamepads()[0].axes[0]&&(dl&&(p||(p=true,keyfocus--)),dl=!0,e=setInterval((()=>{if(-1!=navigator.getGamepads()[0].axes[0])return dl=!1,p=false,clearInterval(e)})))})),dl=!1,setInterval((()=>{let e;1==navigator.getGamepads()[0].axes[0]&&(dl&&(p||(p=true,keyfocus++)),dl=!0,e=setInterval((()=>{if(1!=navigator.getGamepads()[0].axes[0])return dl=!1,p=false,clearInterval(e)})))}))})();
+        window.controller = controller;
+        controller.on("left0", () => {}).before("left0", () => lockInput?(keyfocus=keyfocus-Object.values(document.querySelectorAll(".hg-row")[Object.values(document.querySelectorAll(".hg-row")).indexOf(document.querySelectorAll(".hg-button")[keyfocus].parentElement)].children).length):(currentFocus==null?currentFocus=0:(currentFocus<1?currentFocus=focusMax:currentFocus--)));
+        controller.on("right0", () => {}).before("right0", () => lockInput?(keyfocus=keyfocus+Object.values(document.querySelectorAll(".hg-row")[Object.values(document.querySelectorAll(".hg-row")).indexOf(document.querySelectorAll(".hg-button")[keyfocus].parentElement)].children).length):(currentFocus==null?currentFocus=0:(currentFocus+1>focusMax?currentFocus=0:currentFocus++)));
+        controller.on("button0", () => {}).before("button0", () => {
+          lockInput&&(document.querySelector(".tabfocus"+currentFocus).value+=document.querySelectorAll(".hg-button")[keyfocus].textContent,createlobbytext=document.querySelector(".tabfocus"+currentFocus).value);
+          if(currentFocus!=null&&document.querySelector(".tabfocus"+currentFocus).tagName.toLowerCase()=="input"){
+            lockInput = document.querySelector(".tabfocus"+currentFocus);
+          }
+          (currentFocus==null||document.querySelector(".tabfocus"+currentFocus).click());
+        });
+        controller.on("button1", () => {}).before("button1", () => (keyfocus=0,lockInput=null,createlobbytext="",swal(),setTimeout(()=>swal.close())));
+        controller.on("right1", () => {typeof document.querySelector(".dialog-content")!="undefined"&&(document.querySelector(".dialog-content").scroll(0,currentScroll),currentScroll++)});
+        controller.on("button11", () => {lockInput&&(lockInput=null);currentFocus+1>focusMax?currentFocus=0:currentFocus++});
+        controller.on("button16", () => {currentFocus=focusMax});
+        controller.on("button15", () => {currentFocus=0});
+        controller.on("button15", () => {currentFocus=0});
+        controller.on("button3", () => {}).before("button3", () => {lockInput&&(lockInput.value=lockInput.value.split("").reverse().splice(1).reverse().join("")),createlobbytext=lockInput.value});
+        controller.on("button12", () => {}).before("button12", () => {location.reload()});
+      });
+    </script>
+  </body>
+</html>
