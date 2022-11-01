@@ -1,10 +1,14 @@
 # <img src="favicon.ico" width="4%"> F-P-S <small>2</small>
+_Note: This is not [The Original Repository](https://github.com/Parking-Master/FPS2)._
+
+<hr>
+
 FPS2 is the all-new FPS, taken to the next level. A whole-new gaming experience with 4+ more maps, original characters and weapons, and a modern FPS feel.<br>
 A big thanks to some 3d model designers for helping create some items in this game. Credits are [below](#credits).
 
 ### Ok, it's great. But where do I play it?
 There's already a working website for the game, _But just note_ that this is a work-in-progress, so the game may not be fully playable yet.
-<p align="center">>&nbsp;&nbsp;>&nbsp;&nbsp;<a href="https://www.fps2.ml">h t t p s : / / w w w . f p s 2 . m l</a>&nbsp;&nbsp;<&nbsp;&nbsp;<</p>
+<p align="center">>&nbsp;&nbsp;>&nbsp;&nbsp;<a href="https://parking-master.github.io/FPS2-Clone">h t t p s : / / p a r k i n g - m a s t e r . g i t h u b . i o / F P S 2 - C l o n e</a>&nbsp;&nbsp;<&nbsp;&nbsp;<</p>
 
 ## About
 Why is FPS 2 better than the original?
